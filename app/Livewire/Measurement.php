@@ -7,11 +7,57 @@ use Livewire\Component;
 
 class Measurement extends Component
 {
-    public $measurements;
+    public $measurements = [];
+    public $insertCount = 0;
+    public $lastId;
 
     public function mount()
     {
-        $this->measurements = ModelsMeasurement::orderBy('created_at', 'desc')->get();
+        $this->loadData();
+    }
+
+    public function loadData()
+    {
+        $currentCount = ModelsMeasurement::count();
+
+        if ($currentCount !== $this->insertCount) {
+            $this->measurements = ModelsMeasurement::orderBy('created_at', 'desc')
+                ->take(24)
+                ->get()
+                ->reverse()
+                ->toArray();
+
+            $this->insertCount = $currentCount;
+
+            $this->dispatch('dataUpdated', $this->measurements);
+        }
+    }
+
+    public function refreshData()
+    {
+        $this->loadData();
+    }
+
+    public function getStatsProperty()
+    {
+        if (empty($this->measurements)) {
+            return [
+                'avgWaterLevel' => 0,
+                'maxWaterLevel' => 0,
+                'totalRainfall' => 0,
+                'maxRainfall' => 0
+            ];
+        }
+
+        $waterLevels = array_column($this->measurements, 'water_level_cm');
+        $rainfalls = array_column($this->measurements, 'rainfall_mm');
+
+        return [
+            'avgWaterLevel' => round(array_sum($waterLevels) / count($waterLevels), 1),
+            'maxWaterLevel' => round(max($waterLevels), 1),
+            'totalRainfall' => round(array_sum($rainfalls), 1),
+            'maxRainfall' => round(max($rainfalls), 1)
+        ];
     }
 
     public function render()
