@@ -25,13 +25,23 @@ class Measurement extends Component
                 ->take(24)
                 ->get()
                 ->reverse()
+                ->map(function ($m) {
+                    return [
+                        'water_level_cm' => $m->water_level_cm,
+                        'rainfall_mm' => $m->rainfall_mm,
+                        'created_at' => $m->created_at->toIso8601String(),
+                    ];
+                })
                 ->toArray();
 
             $this->insertCount = $currentCount;
 
-            $this->dispatch('dataUpdated', $this->measurements);
+            $this->dispatch('dataUpdated', $this->measurements); 
+
+
         }
     }
+
 
     public function refreshData()
     {

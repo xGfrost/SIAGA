@@ -177,14 +177,32 @@
         let rainChart = null;
 
         function renderCharts(measurements) {
+            console.log("Data mentah yang diterima:", measurements);
+
             const lastMeasurements = measurements.slice(-7);
+
             const labels = lastMeasurements.map(m => {
-                const date = new Date(m.created_at);
-                return date.toLocaleTimeString('id-ID', {
+                console.log(typeof m.created_at, m.created_at);
+                if (!m.created_at) {
+                    console.warn('Data tanpa created_at:', m);
+                    return 'Invalid';
+                }
+
+                const timestamp = Date.parse(m.created_at); // ini return-nya number
+                if (isNaN(timestamp)) {
+                    console.warn('Gagal parse date:', m.created_at);
+                    return 'Invalid';
+                }
+
+                const parsedDate = new Date(timestamp);
+                return parsedDate.toLocaleTimeString('id-ID', {
                     hour: '2-digit',
                     minute: '2-digit'
                 });
             });
+
+
+            console.log("Labels hasil parsing:", labels); // ✅ Sekarang ini akan menunjukkan label waktu yang benar
 
             const waterLevels = lastMeasurements.map(m => m.water_level_cm);
             const rainfalls = lastMeasurements.map(m => m.rainfall_mm);
@@ -210,7 +228,7 @@
                     zoom: {
                         pan: {
                             enabled: true,
-                            mode: 'x',
+                            mode: 'x'
                         },
                         zoom: {
                             pinch: {
@@ -219,7 +237,7 @@
                             wheel: {
                                 enabled: true
                             },
-                            mode: 'x',
+                            mode: 'x'
                         }
                     }
                 },
@@ -311,12 +329,26 @@
             });
         }
 
+
         Livewire.on('dataUpdated', (data) => {
-            renderCharts(data);
+            console.log("Data mentah yang diterima:", data);
+
+            let measurements = [];
+
+            if (data.length === 1 && typeof data[0] === 'object' && !Array.isArray(data[0])) {
+                const obj = data[0];
+                measurements = Object.keys(obj).map(k => obj[k]);
+            } else {
+                measurements = data;
+            }
+
+            renderCharts(measurements);
         });
 
+
+
         document.addEventListener('DOMContentLoaded', () => {
-            Livewire.emit('refreshData');
+            Livewire.dispatch('refreshData');
         });
     </script>
 @endpush
