@@ -311,6 +311,8 @@
             }
         });
 
+
+
         document.addEventListener('DOMContentLoaded', () => {
             const el = document.querySelector('[wire\\:id]');
             if (el) {

@@ -36,8 +36,11 @@ class Measurement extends Component
             $this->insertCount = $currentCount;
 
             $this->dispatch('dataUpdated', $this->measurements);
+
+
         }
     }
+
 
     public function refreshData()
     {
