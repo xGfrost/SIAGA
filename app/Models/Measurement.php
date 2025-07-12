@@ -9,8 +9,5 @@ class Measurement extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'water_level_cm',
-        'rainfall_mm',
-    ];
+    protected $fillable = ['water_level_cm', 'rainfall_mm', 'created_at'];
 }

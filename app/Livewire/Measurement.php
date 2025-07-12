@@ -22,10 +22,16 @@ class Measurement extends Component
 
         if ($currentCount !== $this->insertCount) {
             $this->measurements = ModelsMeasurement::orderBy('created_at', 'desc')
-                ->take(24)
-                ->get()
-                ->reverse()
-                ->toArray();
+            ->take(7)
+            ->get()
+            ->reverse()
+            ->map(function ($m) {
+                return [
+                    'water_level_cm' => $m->water_level_cm,
+                    'rainfall_mm' => $m->rainfall_mm,
+                    'created_at' => $m->created_at->toISOString(),
+                ];
+            })->values()->toArray();
 
             $this->insertCount = $currentCount;
 
@@ -35,6 +41,11 @@ class Measurement extends Component
 
     public function refreshData()
     {
+        ModelsMeasurement::create([
+            'water_level_cm' => round(mt_rand(100, 300) / 10, 1),
+            'rainfall_mm'    => round(mt_rand(0, 100) / 10, 1),
+        ]);
+
         $this->loadData();
     }
 
@@ -62,6 +73,8 @@ class Measurement extends Component
 
     public function render()
     {
-        return view('livewire.measurement');
+        return view('livewire.measurement', [
+            'measurements' => $this->measurements,
+        ]);
     }
 }

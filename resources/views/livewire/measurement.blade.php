@@ -45,7 +45,7 @@
                             <div class="text-xs text-gray-500">Max (cm)</div>
                         </div>
                     </div>
-                    <div class="relative">
+                    <div class="relative" wire:ignore>
                         <canvas id="waterChart" height="300" class="rounded-lg"></canvas>
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-blue-50/20 to-transparent rounded-lg pointer-events-none">
@@ -77,7 +77,7 @@
                             <div class="text-xs text-gray-500">Max (mm)</div>
                         </div>
                     </div>
-                    <div class="relative">
+                    <div class="relative" wire:ignore>
                         <canvas id="rainChart" height="300" class="rounded-lg"></canvas>
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-red-50/20 to-transparent rounded-lg pointer-events-none">
@@ -158,6 +158,7 @@
             </div>
         </div>
 
+
         <!-- Footer -->
         <div class="text-center py-8">
             <div
@@ -175,26 +176,16 @@
     <script>
         let waterChart = null;
         let rainChart = null;
+        const maxPoints = 7;
 
-        function renderCharts(measurements) {
-            const lastMeasurements = measurements.slice(-7);
-            const labels = lastMeasurements.map(m => {
-                const date = new Date(m.created_at);
-                return date.toLocaleTimeString('id-ID', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            });
-
-            const waterLevels = lastMeasurements.map(m => m.water_level_cm);
-            const rainfalls = lastMeasurements.map(m => m.rainfall_mm);
-
+        function initCharts(labels, waterData, rainData) {
             const waterCtx = document.getElementById('waterChart').getContext('2d');
             const rainCtx = document.getElementById('rainChart').getContext('2d');
 
             const commonOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: false,
                 plugins: {
                     legend: {
                         labels: {
@@ -205,21 +196,6 @@
                             },
                             usePointStyle: true,
                             padding: 20
-                        }
-                    },
-                    zoom: {
-                        pan: {
-                            enabled: true,
-                            mode: 'x',
-                        },
-                        zoom: {
-                            pinch: {
-                                enabled: true
-                            },
-                            wheel: {
-                                enabled: true
-                            },
-                            mode: 'x',
                         }
                     }
                 },
@@ -254,69 +230,92 @@
                 },
                 elements: {
                     point: {
-                        radius: 4,
-                        hoverRadius: 8,
-                        borderWidth: 3,
-                        hoverBorderWidth: 4
+                        radius: 2,
+                        hoverRadius: 4
                     },
                     line: {
-                        borderWidth: 3,
-                        tension: 0.4
+                        borderWidth: 2,
+                        tension: 0.3
                     }
                 }
             };
 
-            if (waterChart) waterChart.destroy();
             waterChart = new Chart(waterCtx, {
                 type: 'line',
                 data: {
-                    labels,
+                    labels: labels,
                     datasets: [{
                         label: 'Ketinggian Air (cm)',
-                        data: waterLevels,
+                        data: waterData,
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59,130,246,0.1)',
-                        fill: true,
-                        pointBackgroundColor: '#3b82f6',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 3,
-                        pointHoverBackgroundColor: '#2563eb',
-                        pointHoverBorderColor: '#fff',
-                        pointHoverBorderWidth: 4
+                        fill: true
                     }]
                 },
                 options: commonOptions
             });
 
-            if (rainChart) rainChart.destroy();
             rainChart = new Chart(rainCtx, {
                 type: 'line',
                 data: {
-                    labels,
+                    labels: labels,
                     datasets: [{
                         label: 'Curah Hujan (mm)',
-                        data: rainfalls,
+                        data: rainData,
                         borderColor: '#ef4444',
                         backgroundColor: 'rgba(239,68,68,0.1)',
-                        fill: true,
-                        pointBackgroundColor: '#ef4444',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 3,
-                        pointHoverBackgroundColor: '#dc2626',
-                        pointHoverBorderColor: '#fff',
-                        pointHoverBorderWidth: 4
+                        fill: true
                     }]
                 },
                 options: commonOptions
             });
         }
 
-        Livewire.on('dataUpdated', (data) => {
-            renderCharts(data);
+        function updateChart(chart, label, data) {
+            chart.data.labels.push(label);
+            chart.data.datasets[0].data.push(data);
+
+            if (chart.data.labels.length > maxPoints) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+
+            chart.update('none');
+        }
+
+        Livewire.on('dataUpdated', (measurements) => {
+            const data = measurements[0];
+
+            const last = data[data.length - 1];
+            const labels = data.map(m => {
+                const date = new Date(m.created_at);
+                return date.toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            });
+
+            const waterLevels = data.map(m => m.water_level_cm);
+            const rainfalls = data.map(m => m.rainfall_mm);
+
+            if (!waterChart || !rainChart) {
+                initCharts(labels, waterLevels, rainfalls);
+            } else {
+                waterChart.data.labels = labels;
+                waterChart.data.datasets[0].data = waterLevels;
+                waterChart.update('none');
+
+                rainChart.data.labels = labels;
+                rainChart.data.datasets[0].data = rainfalls;
+                rainChart.update('none');
+            }
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            Livewire.emit('refreshData');
+            const el = document.querySelector('[wire\\:id]');
+            if (el) {
+                Livewire.find(el.id)?.call('refreshData');
+            }
         });
     </script>
 @endpush

@@ -12,6 +12,7 @@
 </head>
 
 <body>
+    @livewireStyles
     @livewire('measurement')
 
     @livewireScripts

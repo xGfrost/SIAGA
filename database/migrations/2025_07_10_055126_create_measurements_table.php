@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->double('water_level_cm');
             $table->double('rainfall_mm');
-            $table->timestamp('created_at')->useCurrent(); 
+            $table->timestamps();
         });
     }
 
