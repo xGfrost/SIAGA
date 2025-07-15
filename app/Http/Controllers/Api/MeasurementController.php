@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\measurement;
+use App\Models\Measurement;
 use Illuminate\Http\Request;
 
 class MeasurementController extends Controller
 {
     public function index()
     {
-        return response()->json(measurement::orderBy('created_at', 'desc')->get());
+        return response()->json(Measurement::orderBy('created_at', 'desc')->get());
     }
 
     public function store(Request $request)
@@ -20,7 +20,7 @@ class MeasurementController extends Controller
             'rainfall_mm' => 'required|numeric',
         ]);
 
-        $measurement = measurement::create($validated);
+        $measurement = Measurement::create($validated);
 
         return response()->json([
             'message' => 'Measurement created successfully',
