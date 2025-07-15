@@ -16,8 +16,8 @@ class MeasurementController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'water_level_cm' => 'required|numeric',
-            'rainfall_mm' => 'required|numeric',
+            'water_level_cm' => 'numeric',
+            'rainfall_mm' => 'numeric',
         ]);
 
         $measurement = Measurement::create($validated);

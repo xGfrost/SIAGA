@@ -5,6 +5,9 @@
             <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl opacity-10 blur-3xl">
             </div>
             <div class="relative z-10 py-8">
+                <div class="flex items-center justify-center mb-5">
+                    <img src="/logo.png" alt="logo" class="size-14 bg-white p-1 rounded-xl shadow-lg">
+                </div>
                 <h1
                     class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-4 tracking-tight">
                     SIAGA

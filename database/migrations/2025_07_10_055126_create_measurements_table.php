@@ -9,8 +9,8 @@ return new class extends Migration {
     {
         Schema::create('measurements', function (Blueprint $table) {
             $table->id();
-            $table->double('water_level_cm');
-            $table->double('rainfall_mm');
+            $table->double('water_level_cm')->nullable();
+            $table->double('rainfall_mm')->nullable();
             $table->timestamps();
         });
     }

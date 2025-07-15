@@ -36,19 +36,12 @@ class Measurement extends Component
             $this->insertCount = $currentCount;
 
             $this->dispatch('dataUpdated', $this->measurements);
-
-
         }
     }
 
 
     public function refreshData()
     {
-        ModelsMeasurement::create([
-            'water_level_cm' => round(mt_rand(100, 300) / 10, 1),
-            'rainfall_mm'    => round(mt_rand(0, 100) / 10, 1),
-        ]);
-
         $this->loadData();
     }
 
