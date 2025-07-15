@@ -1,4 +1,4 @@
-<div wire:poll.5s="refreshData" class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
+<div wire:poll.30s="refreshData" class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
     <div class="max-w-7xl mx-auto space-y-10">
         <!-- Header Section -->
         <div class="text-center relative">
