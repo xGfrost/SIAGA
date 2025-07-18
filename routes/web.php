@@ -11,7 +11,7 @@ Route::get('send-wa', function(){
     $response = Http::withHeaders([
         'Authorization' => 'Ym1nx6mH6AXQBLT9yCJ1',
     ])->post('https://api.fonnte.com/send', [
-        'target' => '6285755842855',
+        'target' => '6281233503740',
         'message' => 'Waspada banjir',
     ]);
 
